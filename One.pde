@@ -4,6 +4,11 @@ int framecount =0;
 float x, y;
 
 float speed = 5;
+float dead_speed = 1.5;
+int framecount_zombie = 0;
+
+
+//randomize potion for player (its might boost the enemy risks are high)
 
 
 
@@ -11,12 +16,10 @@ float speed = 5;
 void setup() {
   size(800, 600);
   zombie = new Enemy();
+  zombie.isFlwing = true; 
   zombie.walk = new PImage[17];
   for(int i = 0 ; i < zombie.walk.length;i++){
      zombie.walk[i] = loadImage("skeleton-move_"+i+".png");
-     if (zombie.walk[i] == null) {
-    println("Failed to load: skeleton-move_" + i + ".png");
-  }
   }
   leon = new Player();
   //leon.charachter = loadImage("survivor-move_rifle_0.png");
@@ -40,7 +43,7 @@ void setup() {
 void draw() {
   background(50);
   imageMode(CENTER);
-
+  text("timer: " + (second()),10,20);
   //image(zombie.enemyImage, zombie.x, zombie.y);
   //println("the zombie x is : " +zombie.x);
 
@@ -56,23 +59,28 @@ void draw() {
     framecount = 0;
   }
   
+  framecount_zombie = (frameCount / 5) % zombie.walk.length;
+  
+  
   //TODO: make sure the zombie will flw leon
   if(zombie.isFlwing == true){
     if(zombie.x < leon.x){
-       zombie.x++; 
+       zombie.x+=dead_speed; 
     }else if(zombie.x > leon.x){
-      zombie.x-=1;
+      zombie.x-=dead_speed;
     }
     if(zombie.y > leon.x){
-        zombie.y -=1;
+        zombie.y -=dead_speed;
     }else if(zombie.y < leon.x){
-      zombie.y++;
+      zombie.y+=dead_speed;
     }
     
     
     
   }
+  
+  //the zombies are always flwing the cahrachter (its a horde!)
 
-  image(zombie.walk[framecount],zombie.x,zombie.y);
+  image(zombie.walk[framecount_zombie],zombie.x,zombie.y);
   image(leon.walk[framecount], leon.x, leon.y);
 }
