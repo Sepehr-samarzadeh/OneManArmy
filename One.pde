@@ -1,11 +1,11 @@
 Enemy zombie;
 Player leon;
-int framecount =0;
-float x, y;
+boolean wPressed, aPressed, sPressed, dPressed;
 
-float speed = 5;
-float dead_speed = 1.5;
-int framecount_zombie = 0;
+float camX = 0;
+float camY = 0;
+
+ArrayList<Enemy>zombies = new ArrayList<Enemy>();
 
 
 //randomize potion for player (its might boost the enemy risks are high)
@@ -14,73 +14,55 @@ int framecount_zombie = 0;
 
 
 void setup() {
-  size(800, 600);
-  zombie = new Enemy();
-  zombie.isFlwing = true; 
-  zombie.walk = new PImage[17];
-  for(int i = 0 ; i < zombie.walk.length;i++){
-     zombie.walk[i] = loadImage("skeleton-move_"+i+".png");
+  size(1000, 800);
+  for (int i = 0; i <20; i++) {
+    float zx = random(width*2) - width;
+    float zy = random(height*2) - height;
+
+    zombies.add(new Enemy(zx, zy));
   }
-  leon = new Player();
-  //leon.charachter = loadImage("survivor-move_rifle_0.png");
-  leon.walk = new PImage[18];
-  for(int i = 0 ; i < leon.walk.length;i++){
-    leon.walk[i] = loadImage("survivor-move_rifle_" + i +".png");
-  }
-  /*walk = new PImage[18];
-  for (int i = 0; i < walk.length; i++) {
-    walk[i] = loadImage("survivor-move_rifle_" + i +".png");
-  }
-  */
-  zombie.x =0;
-  zombie.y =100;
-  leon.x = width/2;
-  leon.y = height/2;
-  //x = width/2;
-  //y = height/2;
+
+  leon = new Player(width/2, height/2);
 }
 
 void draw() {
   background(50);
-  imageMode(CENTER);
-  text("timer: " + (second()),10,20);
-  //image(zombie.enemyImage, zombie.x, zombie.y);
-  //println("the zombie x is : " +zombie.x);
-
-    if (keyPressed) {
-    if (keyCode == LEFT)  leon.x -= speed;
-    if (keyCode == RIGHT) leon.x += speed;
-    if (keyCode == UP)    leon.y -= speed;
-    if (keyCode == DOWN)  leon.y += speed;
-
-
-    framecount = (frameCount / 5) % zombie.walk.length;
-  } else {
-    framecount = 0;
-  }
+  //imageMode(CENTER);
+  camX = width/2 - leon.x;
+  camY = height/2 - leon.y;
   
-  framecount_zombie = (frameCount / 5) % zombie.walk.length;
+  //apply camera
+  pushMatrix();
+  translate(camX,camY);
+  //scale(0.5);
+  //imageMode(CENTER);
   
+  leon.update(wPressed,aPressed,sPressed,dPressed);
   
-  //TODO: make sure the zombie will flw leon
-  if(zombie.isFlwing == true){
-    if(zombie.x < leon.x){
-       zombie.x+=dead_speed; 
-    }else if(zombie.x > leon.x){
-      zombie.x-=dead_speed;
-    }
-    if(zombie.y > leon.x){
-        zombie.y -=dead_speed;
-    }else if(zombie.y < leon.x){
-      zombie.y+=dead_speed;
-    }
-    
-    
+  for(Enemy z : zombies){
+    z.update(leon);
+    z.display();
     
   }
   
-  //the zombies are always flwing the cahrachter (its a horde!)
+  leon.display();
+  popMatrix();
+}
 
-  image(zombie.walk[framecount_zombie],zombie.x,zombie.y);
-  image(leon.walk[framecount], leon.x, leon.y);
+
+
+
+void keyPressed() {
+
+  if (key == 'w' || key == 'W') wPressed = true;
+  if (key == 'a' || key == 'A') aPressed = true;
+  if (key == 's' || key == 'S') sPressed = true;
+  if (key == 'd' || key == 'D') dPressed = true;
+}
+
+void keyReleased() {
+  if (key == 'w' || key == 'W') wPressed = false;
+  if (key == 'a' || key == 'A') aPressed = false;
+  if (key == 's' || key == 'S') sPressed = false;
+  if (key == 'd' || key == 'D') dPressed = false;
 }
