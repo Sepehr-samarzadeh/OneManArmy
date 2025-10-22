@@ -29,7 +29,16 @@ class Enemy {
 
  }
  
+ float getWidth(){
+    return walk[0].width; 
+ }
+ 
+ float getHeight(){
+   return walk[0].height;
+ }
+ 
  void display(){
+   imageMode(CENTER);
   image(walk[framecount],x,y); 
    
  }
