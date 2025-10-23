@@ -1,3 +1,7 @@
+import processing.sound.*;
+SoundFile gunshot;
+SoundFile bgMusic;
+SoundFile iHateyou;
 Enemy zombie;
 Player leon;
 JSONObject map;
@@ -16,11 +20,6 @@ Tileset[] loadedTilesets;
 ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 boolean shooting = false;
 
-//TODO:
-//add consuamables //make it randomize so sometimes its better to not pickup an item
-//add healthbar (not really want to do)
-//background
-//better flw logic
 
 
 
@@ -62,6 +61,11 @@ void setup() {
   }
 
   leon = new Player(width/2, height/2);
+  
+  gunshot = new SoundFile(this,"gun.mp3");
+  bgMusic = new SoundFile(this,"bgmusic.mp3");
+  iHateyou = new SoundFile(this,"ihateyou.mp3");
+  bgMusic.loop();
 }
 
 void draw() {
@@ -74,6 +78,9 @@ void draw() {
     text("YOU DIED", width/2, height/2);
     textSize(20);
     text("press R to restart", width/2, height/2 + 60);
+    if(bgMusic.isPlaying()) bgMusic.stop();
+    iHateyou.play();
+    
     noLoop();
     return;
   }
@@ -184,7 +191,10 @@ void draw() {
 
 
   void mousePressed() {
-    if (mouseButton == LEFT) shooting = true;
+    if (mouseButton == LEFT) {
+      shooting = true;
+      gunshot.play();
+  }
   }
 
   void mouseReleased() {
