@@ -2,11 +2,15 @@ import processing.sound.*;
 SoundFile gunshot;
 SoundFile bgMusic;
 SoundFile iHateyou;
+
 Enemy zombie;
 Player leon;
+
 JSONObject map;
 JSONArray layers, tilesets;
+
 boolean wPressed, aPressed, sPressed, dPressed;
+
 int tileWidth, tileHeight, mapWidth, mapHeight;
 
 float camX = 0;
@@ -21,12 +25,14 @@ ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 boolean shooting = false;
 
 
-
+String joke;
 
 
 void setup() {
   size(960, 640);
   map = loadJSONObject("themap.json");
+
+  getJoke();
 
   tileWidth = map.getInt("tilewidth");
   tileHeight = map.getInt("tileheight");
@@ -61,10 +67,10 @@ void setup() {
   }
 
   leon = new Player(width/2, height/2);
-  
-  gunshot = new SoundFile(this,"gun.mp3");
-  bgMusic = new SoundFile(this,"bgmusic.mp3");
-  iHateyou = new SoundFile(this,"ihateyou.mp3");
+
+  gunshot = new SoundFile(this, "gun.mp3");
+  bgMusic = new SoundFile(this, "bgmusic.mp3");
+  iHateyou = new SoundFile(this, "ihateyou.mp3");
   bgMusic.loop();
 }
 
@@ -78,9 +84,14 @@ void draw() {
     text("YOU DIED", width/2, height/2);
     textSize(20);
     text("press R to restart", width/2, height/2 + 60);
-    if(bgMusic.isPlaying()) bgMusic.stop();
+    textAlign(CENTER,BOTTOM);
+    textSize(18);
+    text(joke, width/2,height/3);
+
+    if (bgMusic.isPlaying()) bgMusic.stop();
     iHateyou.play();
-    
+
+
     noLoop();
     return;
   }
@@ -148,100 +159,106 @@ void draw() {
         break;
       }
     }
-    if(b.offScreen()) bullets.remove(i);
+    if (b.offScreen()) bullets.remove(i);
   }
 
-    for (Enemy z : zombies) {
-      z.update(leon);
-      z.display();
+  for (Enemy z : zombies) {
+    z.update(leon);
+    z.display();
 
 
-      if (checkCollision(leon.x, leon.y, leon.getWidth(), leon.getHeight(), z.x, z.y, z.getWidth(), z.getHeight())) {
-        gameOver = true;
-      }
-    }
-
-
-
-    leon.display();
-    popMatrix();
-  }
-
-
-
-
-  void keyPressed() {
-
-    if (key == 'w' || key == 'W') wPressed = true;
-    if (key == 'a' || key == 'A') aPressed = true;
-    if (key == 's' || key == 'S') sPressed = true;
-    if (key == 'd' || key == 'D') dPressed = true;
-
-    if (gameOver && key == 'r' || key == 'R') {
-      restartGame();
+    if (checkCollision(leon.x, leon.y, leon.getWidth(), leon.getHeight(), z.x, z.y, z.getWidth(), z.getHeight())) {
+      gameOver = true;
     }
   }
 
-  void keyReleased() {
-    if (key == 'w' || key == 'W') wPressed = false;
-    if (key == 'a' || key == 'A') aPressed = false;
-    if (key == 's' || key == 'S') sPressed = false;
-    if (key == 'd' || key == 'D') dPressed = false;
+
+
+  leon.display();
+  popMatrix();
+}
+
+
+
+
+void keyPressed() {
+
+  if (key == 'w' || key == 'W') wPressed = true;
+  if (key == 'a' || key == 'A') aPressed = true;
+  if (key == 's' || key == 'S') sPressed = true;
+  if (key == 'd' || key == 'D') dPressed = true;
+
+  if (gameOver && key == 'r' || key == 'R') {
+    restartGame();
   }
+}
+
+void keyReleased() {
+  if (key == 'w' || key == 'W') wPressed = false;
+  if (key == 'a' || key == 'A') aPressed = false;
+  if (key == 's' || key == 'S') sPressed = false;
+  if (key == 'd' || key == 'D') dPressed = false;
+}
 
 
-  void mousePressed() {
-    if (mouseButton == LEFT) {
-      shooting = true;
-      gunshot.play();
+void mousePressed() {
+  if (mouseButton == LEFT) {
+    shooting = true;
+    gunshot.play();
   }
-  }
+}
 
-  void mouseReleased() {
-    if (mouseButton == LEFT) shooting = false;
-  }
+void mouseReleased() {
+  if (mouseButton == LEFT) shooting = false;
+}
 
 
 
-  Tileset findTileset(int gid) {
-    Tileset result = null;
-    for (int i = 0; i < loadedTilesets.length; i++) {
-      Tileset ts = loadedTilesets[i];
+Tileset findTileset(int gid) {
+  Tileset result = null;
+  for (int i = 0; i < loadedTilesets.length; i++) {
+    Tileset ts = loadedTilesets[i];
 
-      if (gid >= ts.firstgid && gid < ts.firstgid + ts.tilecount) {
-        result = ts;
-      }
+    if (gid >= ts.firstgid && gid < ts.firstgid + ts.tilecount) {
+      result = ts;
     }
-    return result;
   }
+  return result;
+}
 
 
 
 
-  boolean checkCollision(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) {
+boolean checkCollision(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) {
 
-    float hitboxScale = 0.5; // smaller = needs to be closer (0.5 = half size box)
+  float hitboxScale = 0.5; // smaller = needs to be closer (0.5 = half size box)
 
-    float hw1 = (r1w * hitboxScale) / 2;
-    float hh1 = (r1h * hitboxScale) / 2;
-    float hw2 = (r2w * hitboxScale) / 2;
-    float hh2 = (r2h * hitboxScale) / 2;
+  float hw1 = (r1w * hitboxScale) / 2;
+  float hh1 = (r1h * hitboxScale) / 2;
+  float hw2 = (r2w * hitboxScale) / 2;
+  float hh2 = (r2h * hitboxScale) / 2;
 
-    return (r1x - hw1 < r2x + hw2 &&
-      r1x + hw1 > r2x - hw2 &&
-      r1y - hh1 < r2y + hh2 &&
-      r1y + hh1 > r2y - hh2);
+  return (r1x - hw1 < r2x + hw2 &&
+    r1x + hw1 > r2x - hw2 &&
+    r1y - hh1 < r2y + hh2 &&
+    r1y + hh1 > r2y - hh2);
+}
+
+void restartGame() {
+
+  leon = new Player(width/2, height/2);
+  zombies.clear();
+  for (int i = 0; i < 20; i++) {
+    float zx = random(width*2) - width;
+    float zy = random(height*2) - height;
+    zombies.add(new Enemy(zx, zy));
   }
+  gameOver = false;
+  getJoke();
+  loop();
+}
 
-  void restartGame() {
-
-    leon = new Player(width/2, height/2);
-    zombies.clear();
-    for (int i = 0; i < 20; i++) {
-      float zx = random(width*2) - width;
-      float zy = random(height*2) - height;
-      zombies.add(new Enemy(zx, zy));
-    }
-    gameOver = false;
-    loop();
-  }
+void getJoke(){
+ JSONObject jokeAPI = loadJSONObject("https://v2.jokeapi.dev/joke/Programming,Miscellaneous?type=single");
+ joke = jokeAPI.getString("joke");
+}
