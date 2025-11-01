@@ -6,10 +6,7 @@ SoundFile iHateyou;
 Enemy zombie;
 Player leon;
 
-
-
 boolean wPressed, aPressed, sPressed, dPressed;
-
 
 
 float camX = 0;
@@ -37,7 +34,7 @@ float bestRecord = 0;
 
 void setup() {
   size(960, 640);
-  noiseSeed(1234); 
+  noiseSeed(1234);
 
   getJoke();
 
@@ -45,7 +42,8 @@ void setup() {
 
 
 
-  for (int i = 0; i <5; i++) {
+  for (int i = 0; i <5; i++) {  //note for teacher : if you want to add more enemy just change the number from 5 to a bigger number // I added 5 for higher fps 
+  // for reseting the game I added 20 so you can see more enemies 
     float zx = random(width*2) - width;
     float zy = random(height*2) - height;
 
@@ -75,7 +73,7 @@ void draw() {
     if (survivalTime > bestRecord) bestRecord = survivalTime;
     drawDeadPrompt();
 
-   
+
     if (bgMusic.isPlaying()) bgMusic.stop();
     iHateyou.play();
 
@@ -89,23 +87,20 @@ void draw() {
     if (survivalTime > bestRecord) bestRecord = survivalTime;
     drawWinPrompt();
 
-    
+
     if (bgMusic.isPlaying()) bgMusic.stop();
     noLoop();
     return;
   }
 
 
-
-  //imageMode(CENTER);
   camX = width/2 - leon.x;
   camY = height/2 - leon.y;
 
 
-  //apply camera
   pushMatrix();
   translate(camX, camY);
-  drawGround(); //newcode
+  drawGround();
 
 
   leon.update(wPressed, aPressed, sPressed, dPressed);
@@ -146,13 +141,10 @@ void draw() {
     isWinner = true;
   }
 
-
-
   leon.display();
   popMatrix();
 
   survivalTime = (millis() - startTime) / 1000.0;
-
   textSize(14);
   textAlign(RIGHT, TOP);
   text("Time: " + nf(survivalTime, 0, 2) + "s", width - 10, 10);
@@ -240,40 +232,40 @@ void getJoke() {
   joke = jokeAPI.getString("joke");
 }
 
-void drawDeadPrompt(){
-   fill(255, 0, 0);
-    textAlign(CENTER, CENTER);
-    textSize(60);
-    text("YOU DIED", width/2, height/2);
-    textSize(20);
-    text("press R to restart", width/2, height/2 + 60);
+void drawDeadPrompt() {
+  fill(255, 0, 0);
+  textAlign(CENTER, CENTER);
+  textSize(60);
+  text("YOU DIED", width/2, height/2);
+  textSize(20);
+  text("press R to restart", width/2, height/2 + 60);
 
-    textSize(24);
-    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +100);
-    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 +130);
+  textSize(24);
+  text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +100);
+  text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 +130);
 
-    textAlign(CENTER, BOTTOM);
-    textSize(18);
-    text(joke, width/2, height/3);
+  textAlign(CENTER, BOTTOM);
+  textSize(18);
+  text(joke, width/2, height/3);
 }
 
-void drawWinPrompt(){
+void drawWinPrompt() {
   fill(0, 255, 0);
-    textAlign(CENTER, CENTER);
-    textSize(60);
-    text("YOU WON", width/2, height/2 - 60);
+  textAlign(CENTER, CENTER);
+  textSize(60);
+  text("YOU WON", width/2, height/2 - 60);
 
-    fill(255);
-    textSize(22);
-    text("Press R to Restart", width/2, height/2);
+  fill(255);
+  textSize(22);
+  text("Press R to Restart", width/2, height/2);
 
-    textSize(20);
-    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +50);
-    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 + 80);
-    
-    textAlign(CENTER, BOTTOM);
-    textSize(18);
-    text(joke, width/2, height/3);
+  textSize(20);
+  text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +50);
+  text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 + 80);
+
+  textAlign(CENTER, BOTTOM);
+  textSize(18);
+  text(joke, width/2, height/3);
 }
 
 
@@ -281,7 +273,6 @@ void drawWinPrompt(){
 void drawGround() {
   noStroke();
 
-  // Calculate visible range dynamically based on camera position
   float startX = leon.x - width * 2;
   float endX   = leon.x + width * 2;
   float startY = leon.y - height * 2;
@@ -291,9 +282,9 @@ void drawGround() {
     for (float x = startX; x < endX; x += 10) {
       float n = noise(x * 0.01, y * 0.01);
       if (n > 0.55) {
-        fill(34, 139, 34); // grass
+        fill(34, 139, 34); 
       } else {
-        fill(139, 69, 19); // dirt
+        fill(139, 69, 19); 
       }
       rect(x, y, 10, 10);
     }
