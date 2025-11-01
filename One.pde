@@ -37,14 +37,15 @@ float bestRecord = 0;
 
 void setup() {
   size(960, 640);
+  noiseSeed(1234); //newcode
 
   getJoke();
-  
+
   introImg = loadImage("intro.jpg");
 
 
 
-  for (int i = 0; i <20; i++) {
+  for (int i = 0; i <5; i++) {
     float zx = random(width*2) - width;
     float zy = random(height*2) - height;
 
@@ -62,13 +63,13 @@ void setup() {
 
 void draw() {
   background(50);
-  
-  if(gameIntro) {
+
+  if (gameIntro) {
     imageMode(CENTER);
-    image(introImg,width/2,height/2,width,height);
+    image(introImg, width/2, height/2, width, height);
     return;
   }
-  
+
 
   if (gameOver) {
     if (survivalTime > bestRecord) bestRecord = survivalTime;
@@ -95,29 +96,29 @@ void draw() {
     noLoop();
     return;
   }
-  
-  if(isWinner){
-    
-    if(survivalTime > bestRecord) bestRecord = survivalTime;
-    
-    fill(0,255,0);
-    textAlign(CENTER,CENTER);
+
+  if (isWinner) {
+
+    if (survivalTime > bestRecord) bestRecord = survivalTime;
+
+    fill(0, 255, 0);
+    textAlign(CENTER, CENTER);
     textSize(60);
-    text("YOU WON",width/2,height/2 - 60);
-    
+    text("YOU WON", width/2, height/2 - 60);
+
     fill(255);
     textSize(22);
-    text("Press R to Restart",width/2,height/2);
-    
+    text("Press R to Restart", width/2, height/2);
+
     textSize(20);
     text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +50);
     text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 + 80);
-    if(bgMusic.isPlaying()) bgMusic.stop();
+    if (bgMusic.isPlaying()) bgMusic.stop();
     noLoop();
     return;
   }
-    
-    
+
+
 
   //imageMode(CENTER);
   camX = width/2 - leon.x;
@@ -127,6 +128,7 @@ void draw() {
   //apply camera
   pushMatrix();
   translate(camX, camY);
+  drawGround(); //newcode
 
 
   leon.update(wPressed, aPressed, sPressed, dPressed);
@@ -162,9 +164,9 @@ void draw() {
       gameOver = true;
     }
   }
-  
-  if(zombies.isEmpty()){
-     isWinner = true; 
+
+  if (zombies.isEmpty()) {
+    isWinner = true;
   }
 
 
@@ -184,17 +186,17 @@ void draw() {
 
 
 void keyPressed() {
-  if(key == ENTER || key == RETURN){
-    if(gameIntro) {
+  if (key == ENTER || key == RETURN) {
+    if (gameIntro) {
       gameIntro = false;
       startTime = millis();
       return;
     }
   }
-    
-    
-    
-  
+
+
+
+
   if (key == 'w' || key == 'W') wPressed = true;
   if (key == 'a' || key == 'A') aPressed = true;
   if (key == 's' || key == 'S') sPressed = true;
@@ -267,4 +269,26 @@ void restartGame() {
 void getJoke() {
   JSONObject jokeAPI = loadJSONObject("https://v2.jokeapi.dev/joke/Programming,Miscellaneous?type=single");
   joke = jokeAPI.getString("joke");
+}
+//new code
+void drawGround() {
+  noStroke();
+
+  // Calculate visible range dynamically based on camera position
+  float startX = leon.x - width * 2;
+  float endX   = leon.x + width * 2;
+  float startY = leon.y - height * 2;
+  float endY   = leon.y + height * 2;
+
+  for (float y = startY; y < endY; y += 10) {
+    for (float x = startX; x < endX; x += 10) {
+      float n = noise(x * 0.01, y * 0.01);
+      if (n > 0.55) {
+        fill(34, 139, 34); // grass
+      } else {
+        fill(139, 69, 19); // dirt
+      }
+      rect(x, y, 10, 10);
+    }
+  }
 }
