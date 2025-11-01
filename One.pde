@@ -6,20 +6,20 @@ SoundFile iHateyou;
 Enemy zombie;
 Player leon;
 
-JSONObject map;
-JSONArray layers, tilesets;
+
 
 boolean wPressed, aPressed, sPressed, dPressed;
 
-int tileWidth, tileHeight, mapWidth, mapHeight;
+
 
 float camX = 0;
 float camY = 0;
 
 boolean gameOver = false;
+boolean gameIntro = true;
 
 ArrayList<Enemy>zombies = new ArrayList<Enemy>();
-Tileset[] loadedTilesets;
+
 
 ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 boolean shooting = false;
@@ -27,37 +27,17 @@ boolean shooting = false;
 
 String joke;
 
+int startTime;
+float survivalTime = 0;
+float bestRecord = 0;
+
 
 void setup() {
   size(960, 640);
-  map = loadJSONObject("themap.json");
 
   getJoke();
 
-  tileWidth = map.getInt("tilewidth");
-  tileHeight = map.getInt("tileheight");
-  mapWidth = map.getInt("width");
-  mapHeight = map.getInt("height");
 
-  tilesets = map.getJSONArray("tilesets");
-  loadedTilesets = new Tileset[tilesets.size()];
-
-
-  for (int i = 0; i <tilesets.size(); i++) {
-    JSONObject ts = tilesets.getJSONObject(i);
-    Tileset t = new Tileset();
-    t.firstgid = ts.getInt("firstgid");
-    t.tilecount = ts.getInt("tilecount");
-    t.columns = ts.getInt("columns");
-    t.imageFile = ts.getString("image");
-    t.image = loadImage(t.imageFile);
-    t.tileWidth = ts.getInt("tilewidth");
-    t.tileHeight = ts.getInt("tileheight");
-
-    loadedTilesets[i] = t;
-  }
-
-  layers = map.getJSONArray("layers");
 
   for (int i = 0; i <20; i++) {
     float zx = random(width*2) - width;
@@ -72,21 +52,42 @@ void setup() {
   bgMusic = new SoundFile(this, "bgmusic.mp3");
   iHateyou = new SoundFile(this, "ihateyou.mp3");
   bgMusic.loop();
+  startTime = millis();
 }
 
 void draw() {
   background(50);
+  
+  if(gameIntro) {
+    fill(255);
+    textAlign(CENTER,CENTER);
+    textSize(40);
+    text("ONE Army Man",width/2,height/3 - 60);
+    textSize(18);
+    text("HOW TO PLAY : ",width/2,height/3 +10);
+    textSize(16);
+    text("W, A, S, D for moving around\n hold left mouse button to shoot \n Survive as long as possible. good luck!\nPress Enter to start",width/2,height/2);
+    return;
+  }
+  
 
   if (gameOver) {
+    if (survivalTime > bestRecord) bestRecord = survivalTime;
+
     fill(255, 0, 0);
     textAlign(CENTER, CENTER);
     textSize(60);
     text("YOU DIED", width/2, height/2);
     textSize(20);
     text("press R to restart", width/2, height/2 + 60);
-    textAlign(CENTER,BOTTOM);
+
+    textSize(24);
+    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +100);
+    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 +130);
+
+    textAlign(CENTER, BOTTOM);
     textSize(18);
-    text(joke, width/2,height/3);
+    text(joke, width/2, height/3);
 
     if (bgMusic.isPlaying()) bgMusic.stop();
     iHateyou.play();
@@ -105,37 +106,6 @@ void draw() {
   //apply camera
   pushMatrix();
   translate(camX, camY);
-  //scale(0.5);
-  //imageMode(CENTER);
-
-
-  for (int l = 0; l <layers.size(); l++) {
-    JSONObject layer = layers.getJSONObject(l);
-    if (!layer.getString("type").equals("tilelayer")) continue;
-    JSONArray data = layer.getJSONArray("data");
-
-    for (int y = 0; y < mapHeight; y++) {
-      for (int x = 0; x< mapWidth; x++) {
-        int gid = data.getInt(y * mapWidth + x);
-        if (gid == 0) continue;
-
-        Tileset ts = findTileset(gid);
-        if (ts == null) continue;
-
-        int localId = gid - ts.firstgid;
-        int sx = (localId % ts.columns) * ts.tileWidth;
-        int sy = (localId / ts.columns) * ts.tileHeight;
-
-        PImage tile = ts.image.get(sx, sy, ts.tileWidth, ts.tileHeight);
-        image(tile, x * tileWidth, y* tileHeight);
-      }
-    }
-  }
-
-
-
-
-
 
 
   leon.update(wPressed, aPressed, sPressed, dPressed);
@@ -176,13 +146,30 @@ void draw() {
 
   leon.display();
   popMatrix();
+
+  survivalTime = (millis() - startTime) / 1000.0;
+
+  textSize(14);
+  textAlign(RIGHT, TOP);
+  text("Time: " + nf(survivalTime, 0, 2) + "s", width - 10, 10);
+  text("Best: " + nf(bestRecord, 0, 2) + "s", width - 10, 30);
 }
 
 
 
 
 void keyPressed() {
-
+  if(key == ENTER || key == RETURN){
+    if(gameIntro) {
+      gameIntro = false;
+      startTime = millis();
+      return;
+    }
+  }
+    
+    
+    
+  
   if (key == 'w' || key == 'W') wPressed = true;
   if (key == 'a' || key == 'A') aPressed = true;
   if (key == 's' || key == 'S') sPressed = true;
@@ -214,17 +201,7 @@ void mouseReleased() {
 
 
 
-Tileset findTileset(int gid) {
-  Tileset result = null;
-  for (int i = 0; i < loadedTilesets.length; i++) {
-    Tileset ts = loadedTilesets[i];
 
-    if (gid >= ts.firstgid && gid < ts.firstgid + ts.tilecount) {
-      result = ts;
-    }
-  }
-  return result;
-}
 
 
 
@@ -256,9 +233,12 @@ void restartGame() {
   gameOver = false;
   getJoke();
   loop();
+  bgMusic.loop();
+
+  startTime = millis();
 }
 
-void getJoke(){
- JSONObject jokeAPI = loadJSONObject("https://v2.jokeapi.dev/joke/Programming,Miscellaneous?type=single");
- joke = jokeAPI.getString("joke");
+void getJoke() {
+  JSONObject jokeAPI = loadJSONObject("https://v2.jokeapi.dev/joke/Programming,Miscellaneous?type=single");
+  joke = jokeAPI.getString("joke");
 }
