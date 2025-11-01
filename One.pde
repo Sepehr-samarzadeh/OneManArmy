@@ -37,7 +37,7 @@ float bestRecord = 0;
 
 void setup() {
   size(960, 640);
-  noiseSeed(1234); //newcode
+  noiseSeed(1234); 
 
   getJoke();
 
@@ -73,22 +73,9 @@ void draw() {
 
   if (gameOver) {
     if (survivalTime > bestRecord) bestRecord = survivalTime;
+    drawDeadPrompt();
 
-    fill(255, 0, 0);
-    textAlign(CENTER, CENTER);
-    textSize(60);
-    text("YOU DIED", width/2, height/2);
-    textSize(20);
-    text("press R to restart", width/2, height/2 + 60);
-
-    textSize(24);
-    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +100);
-    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 +130);
-
-    textAlign(CENTER, BOTTOM);
-    textSize(18);
-    text(joke, width/2, height/3);
-
+   
     if (bgMusic.isPlaying()) bgMusic.stop();
     iHateyou.play();
 
@@ -100,19 +87,9 @@ void draw() {
   if (isWinner) {
 
     if (survivalTime > bestRecord) bestRecord = survivalTime;
+    drawWinPrompt();
 
-    fill(0, 255, 0);
-    textAlign(CENTER, CENTER);
-    textSize(60);
-    text("YOU WON", width/2, height/2 - 60);
-
-    fill(255);
-    textSize(22);
-    text("Press R to Restart", width/2, height/2);
-
-    textSize(20);
-    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +50);
-    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 + 80);
+    
     if (bgMusic.isPlaying()) bgMusic.stop();
     noLoop();
     return;
@@ -195,8 +172,6 @@ void keyPressed() {
   }
 
 
-
-
   if (key == 'w' || key == 'W') wPressed = true;
   if (key == 'a' || key == 'A') aPressed = true;
   if (key == 's' || key == 'S') sPressed = true;
@@ -225,12 +200,6 @@ void mousePressed() {
 void mouseReleased() {
   if (mouseButton == LEFT) shooting = false;
 }
-
-
-
-
-
-
 
 
 boolean checkCollision(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) {
@@ -270,7 +239,45 @@ void getJoke() {
   JSONObject jokeAPI = loadJSONObject("https://v2.jokeapi.dev/joke/Programming,Miscellaneous?type=single");
   joke = jokeAPI.getString("joke");
 }
-//new code
+
+void drawDeadPrompt(){
+   fill(255, 0, 0);
+    textAlign(CENTER, CENTER);
+    textSize(60);
+    text("YOU DIED", width/2, height/2);
+    textSize(20);
+    text("press R to restart", width/2, height/2 + 60);
+
+    textSize(24);
+    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +100);
+    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 +130);
+
+    textAlign(CENTER, BOTTOM);
+    textSize(18);
+    text(joke, width/2, height/3);
+}
+
+void drawWinPrompt(){
+  fill(0, 255, 0);
+    textAlign(CENTER, CENTER);
+    textSize(60);
+    text("YOU WON", width/2, height/2 - 60);
+
+    fill(255);
+    textSize(22);
+    text("Press R to Restart", width/2, height/2);
+
+    textSize(20);
+    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +50);
+    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 + 80);
+    
+    textAlign(CENTER, BOTTOM);
+    textSize(18);
+    text(joke, width/2, height/3);
+}
+
+
+
 void drawGround() {
   noStroke();
 
