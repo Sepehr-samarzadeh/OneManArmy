@@ -17,6 +17,9 @@ float camY = 0;
 
 boolean gameOver = false;
 boolean gameIntro = true;
+boolean isWinner = false;
+
+PImage introImg;
 
 ArrayList<Enemy>zombies = new ArrayList<Enemy>();
 
@@ -36,6 +39,8 @@ void setup() {
   size(960, 640);
 
   getJoke();
+  
+  introImg = loadImage("intro.jpg");
 
 
 
@@ -59,14 +64,8 @@ void draw() {
   background(50);
   
   if(gameIntro) {
-    fill(255);
-    textAlign(CENTER,CENTER);
-    textSize(40);
-    text("ONE Army Man",width/2,height/3 - 60);
-    textSize(18);
-    text("HOW TO PLAY : ",width/2,height/3 +10);
-    textSize(16);
-    text("W, A, S, D for moving around\n hold left mouse button to shoot \n Survive as long as possible. good luck!\nPress Enter to start",width/2,height/2);
+    imageMode(CENTER);
+    image(introImg,width/2,height/2,width,height);
     return;
   }
   
@@ -96,7 +95,29 @@ void draw() {
     noLoop();
     return;
   }
-
+  
+  if(isWinner){
+    
+    if(survivalTime > bestRecord) bestRecord = survivalTime;
+    
+    fill(0,255,0);
+    textAlign(CENTER,CENTER);
+    textSize(60);
+    text("YOU WON",width/2,height/2 - 60);
+    
+    fill(255);
+    textSize(22);
+    text("Press R to Restart",width/2,height/2);
+    
+    textSize(20);
+    text("You survived: " +nf(survivalTime, 0, 2)+ "s", width/2, height/2 +50);
+    text("Best record: " +nf(bestRecord, 0, 2)+ "s", width/2, height/2 + 80);
+    if(bgMusic.isPlaying()) bgMusic.stop();
+    noLoop();
+    return;
+  }
+    
+    
 
   //imageMode(CENTER);
   camX = width/2 - leon.x;
@@ -141,6 +162,10 @@ void draw() {
       gameOver = true;
     }
   }
+  
+  if(zombies.isEmpty()){
+     isWinner = true; 
+  }
 
 
 
@@ -175,7 +200,7 @@ void keyPressed() {
   if (key == 's' || key == 'S') sPressed = true;
   if (key == 'd' || key == 'D') dPressed = true;
 
-  if (gameOver && key == 'r' || key == 'R') {
+  if (gameOver || isWinner && key == 'r' || key == 'R') {
     restartGame();
   }
 }
@@ -231,6 +256,7 @@ void restartGame() {
     zombies.add(new Enemy(zx, zy));
   }
   gameOver = false;
+  isWinner = false;
   getJoke();
   loop();
   bgMusic.loop();
